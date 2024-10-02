@@ -1,0 +1,56 @@
+@startuml
+
+' Enumeración de fases con nombres de scripts
+enum WorkflowPhase {
+    PRE_CLASSIFY("preclassify")
+    PRE_EXTRACT("preextract")
+    VALIDATE("validate")
+    HOMOLOGATE("homologate")
+    VERIFY_LOG("verifylog")
+    FUNCTION_KEY("functionkey")
+    PROJECT_CHANGE("projectchange")
+    POST_VALIDATE("postvalidate")
+    EXPORT("export")
+    --
+    + getScriptName() : String
+}
+
+' Interfaces
+interface IScriptExecutor {
+    + executeScript(scriptName: String, batchJsonDTO: BatchJsonDTO, workingPath: String) : void
+}
+
+interface IBatchJsonFileService {
+    + saveBatchJson(batchJsonDTO: BatchJsonDTO, workingPath: String) : void
+    + readBatchJson(batchId: String, workingPath: String) : BatchJsonDTO
+}
+
+' Implementaciones de IScriptExecutor
+class LocalScriptExecutor implements IScriptExecutor
+class HttpScriptExecutor implements IScriptExecutor
+
+' Implementación de IBatchJsonFileService
+class BatchJsonFileService implements IBatchJsonFileService
+
+' Clase CustomFunctionality
+class CustomFunctionality {
+    + executePhase(phase: WorkflowPhase, batchJsonDTO: BatchJsonDTO, workingPath: String) : BatchJsonDTO
+    --
+    - scriptExecutor: IScriptExecutor
+    - fileService: IBatchJsonFileService
+}
+
+' Excepciones
+abstract class CustomException
+class ScriptExecutionException extends CustomException
+class FileServiceException extends CustomException
+
+' Relaciones
+CustomFunctionality --> IScriptExecutor
+CustomFunctionality --> IBatchJsonFileService
+CustomFunctionality ..> WorkflowPhase
+CustomFunctionality ..> BatchJsonDTO
+
+
+
+@enduml
